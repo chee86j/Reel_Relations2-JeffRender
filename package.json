@@ -36,6 +36,7 @@
     "react-autosuggest": "^10.1.0",
     "react-avatar-edit": "^1.2.0",
     "react-icons": "^4.10.1",
+    "react-parallax-tilt": "^1.7.168",
     "react-toastify": "^9.1.3",
     "sequelize": "^6.25.3",
     "style-loader": "^3.3.3",

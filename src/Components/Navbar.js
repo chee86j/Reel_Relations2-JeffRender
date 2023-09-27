@@ -134,7 +134,7 @@ const Navbar = () => {
       <div className="block lg:hidden">
         <button
           onClick={toggleMenu}
-          className="flex items-center px-3 py-2 border rounded text-white border-white-400 hover:text-white hover:border-teal-400"
+          className="flex items-center px-1 py-1 border rounded text-white border-white-400 hover:text-white hover:border-teal-400"
         >
           <svg
             className="fill-current h-3 w-3 text-white"

@@ -57,17 +57,18 @@ const App = () => {
         backgroundSize: "cover",
         backgroundRepeat: "no-repeat",
         backgroundAttachment: "fixed",
-        minHeight: "100vh", // Ensure the background covers the entire viewport
+        minHeight: "100vh",
+        minWidth: "100vw",
+        backgroundPosition: "center",
       }}
     >
-      {/* Your app content */}
       <button
-        className="theme text-white flex text-lg tracking-tight absolute left-7 top-12 px-3 py-2 rounded-md focus:outline-none focus:shadow-outline"
+        className="theme border rounded text-teal-200 border-white-400 hover:text-white hover:border-teal-400 flex text-md tracking-tight absolute left-6 top-2 mb-4 rounded-md focus:outline-none focus:shadow-outline"
         onClick={handleThemeToggle}
       >
-        Change Theme
+        Theme
       </button>
-      <div>
+      <div style={{ paddingTop: "1rem" }}>
         <Navbar />
         <Routes>
           {auth.id ? (

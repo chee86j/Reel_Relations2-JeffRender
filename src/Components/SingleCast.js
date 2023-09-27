@@ -15,6 +15,7 @@ import Spinner from "./Spinner";
 import { ChevronsLeft, ChevronsRight } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Tilt from "react-parallax-tilt";
 
 const SingleCast = () => {
   const dispatch = useDispatch();
@@ -137,11 +138,18 @@ const SingleCast = () => {
             )}
           </span>
         )}
-        <img
-          className="w-[300px] h-[450px] min-w-[300px] min-h-[450px] block rounded-lg my-4"
-          src={`https://image.tmdb.org/t/p/original${singleActor.profile_path}`}
-          alt="Actor Profile"
-        />
+        <Tilt
+          className="parallax-effect-glare-scale"
+          perspective={500}
+          glareEnable={true}
+          glareMaxOpacity={0.45}
+        >
+          <img
+            className="w-[300px] h-[450px] min-w-[300px] min-h-[450px] block rounded-lg my-4"
+            src={`https://image.tmdb.org/t/p/original${singleActor.profile_path}`}
+            alt="Actor Profile"
+          />
+        </Tilt>
         <h1>Current Age: {currentAge} years old</h1>
         <h1>Birthday: {singleActor.birthday} </h1>
         {singleActor.deathday && <h1>Died: {singleActor.deathday}</h1>}
@@ -186,15 +194,22 @@ const SingleCast = () => {
             <ul className="flex">
               {popularMovies.map((movie) => {
                 return (
-                  <li key={movie.id} className="w-[130px] mr-4 flex-shrink-0">
-                    <Link to={`/movie/${movie.id}`}>
-                      <img
-                        className="w-[130px] h-[195px] object-cover"
-                        src={`https://image.tmdb.org/t/p/original/${movie.poster_path}`}
-                      />
-                      <p className="text-center">{movie.title}</p>
-                    </Link>
-                  </li>
+                  <Tilt
+                    className="parallax-effect-glare-scale"
+                    perspective={500}
+                    glareEnable={true}
+                    glareMaxOpacity={0.45}
+                  >
+                    <li key={movie.id} className="w-[130px] mr-4 flex-shrink-0">
+                      <Link to={`/movie/${movie.id}`}>
+                        <img
+                          className="w-[130px] h-[195px] object-cover"
+                          src={`https://image.tmdb.org/t/p/original/${movie.poster_path}`}
+                        />
+                        <p className="text-center">{movie.title}</p>
+                      </Link>
+                    </li>
+                  </Tilt>
                 );
               })}
             </ul>

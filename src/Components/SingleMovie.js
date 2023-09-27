@@ -16,6 +16,7 @@ import { useParams, NavLink, Link } from "react-router-dom";
 import Spinner from "./Spinner";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Tilt from "react-parallax-tilt";
 
 // Star Rating component
 const StarRating = ({ rating }) => {
@@ -138,7 +139,7 @@ const SingleMovie = () => {
     // </div>
     <Spinner />
   ) : (
-    <div className="flex p-8 text-text-white">
+    <div className="flex p-8 text-white">
       <div className="mx-6 w-[300px]">
         {/* {auth.username && (
           <span>
@@ -155,13 +156,20 @@ const SingleMovie = () => {
             )}
           </span>
         )} */}
-        <img
-          className="w-full h-[450px] min-w-[300px] min-h-[450px] block rounded-lg my-4"
-          src={`https://image.tmdb.org/t/p/original${singleMovie.poster_path}`}
-          alt="Movie Poster"
-        />
+        <Tilt
+          className="parallax-effect-glare-scale"
+          perspective={500}
+          glareEnable={true}
+          glareMaxOpacity={0.45}
+        >
+          <img
+            className="w-full h-[450px] min-w-[300px] min-h-[450px] block rounded-lg my-4"
+            src={`https://image.tmdb.org/t/p/original${singleMovie.poster_path}`}
+            alt="Movie Poster"
+          />
+        </Tilt>
       </div>
-      <div className="flex-1 pl-[30px] overflow-x-hidden">
+      <div className="flex-1 pl-[30px] overflow-x-hidden text-white">
         <h1 className="mb-[8px] font-bold text-lg">
           {singleMovie.title} ({releaseYear}){" "}
           {auth.username && isSingleInDb(singleMovie.id) && (
@@ -196,17 +204,24 @@ const SingleMovie = () => {
             <ul className="flex">
               {popularActors.map((actor) => {
                 return (
-                  <li key={actor.id} className="w-[130px] mr-4 flex-shrink-0">
-                    <Link to={`/casts/${actor.id}`}>
-                      <img
-                        className="w-[130px] h-[195px] object-cover"
-                        src={`https://image.tmdb.org/t/p/original/${actor.profile_path}`}
-                      />
-                      <div className="text-center">{actor.name}</div>
-                    </Link>
-                    <div className="text-center">as </div>
-                    <div className="text-center">{actor.character}</div>
-                  </li>
+                  <Tilt
+                    className="parallax-effect-glare-scale"
+                    perspective={500}
+                    glareEnable={true}
+                    glareMaxOpacity={0.45}
+                  >
+                    <li key={actor.id} className="w-[130px] mr-4 flex-shrink-0">
+                      <Link to={`/casts/${actor.id}`}>
+                        <img
+                          className="w-[130px] h-[195px] object-cover"
+                          src={`https://image.tmdb.org/t/p/original/${actor.profile_path}`}
+                        />
+                        <div className="text-center">{actor.name}</div>
+                      </Link>
+                      <div className="text-center">as </div>
+                      <div className="text-center">{actor.character}</div>
+                    </li>
+                  </Tilt>
                 );
               })}
             </ul>

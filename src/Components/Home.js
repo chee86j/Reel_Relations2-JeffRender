@@ -7,6 +7,7 @@ import { fetchDegreesOfSeparation } from "../utils/api";
 import Spinner from "./Spinner";
 import Autosuggest from "react-autosuggest";
 import axios from "axios";
+import Tilt from "react-parallax-tilt";
 
 const Home = () => {
   const [loading, setLoading] = useState(false);
@@ -146,7 +147,7 @@ const Home = () => {
               input:
                 "p-2 pl-10 pr-4 rounded-l-md border border-lime-400 text-2xl font-bold normal-case hover:bg-slate-600 focus:outline-none",
               suggestionsContainer:
-                "absolute z-10 mt-2 w-full rounded-lg shadow-lg",
+                "absolute z-10 mt-2 w-full max-w-md rounded-lg shadow-lg", // Set max-width here
               suggestionsList: "bg-black",
             }}
           />
@@ -181,7 +182,7 @@ const Home = () => {
               input:
                 "p-2 pl-10 pr-4 rounded-l-md border border-lime-400 text-2xl font-bold normal-case hover:bg-slate-600 focus:outline-none",
               suggestionsContainer:
-                "absolute z-10 mt-2 w-full rounded-lg shadow-lg",
+                "absolute z-10 mt-2 w-full max-w-md rounded-lg shadow-lg", // Set max-width here
               suggestionsList: "bg-black",
             }}
           />
@@ -210,11 +211,20 @@ const Home = () => {
                   {node.name ? (
                     /* Actor Image Cards Found After Link is Found */
                     <div className="flex items-center">
-                      <img
-                        src={node.profile_path}
-                        alt={node.name}
-                        className="w-[65px] h-[78px] min-w-[65px] min-h-[78px] object-scale-down rounded mr-2 border-white border-2"
-                      />
+                      {/* Link to Tilt guide https://mkosir.github.io/react-parallax-tilt/?path=/story/react-parallax-tilt--default */}
+                      <Tilt
+                        className="parallax-effect-glare-scale"
+                        perspective={500}
+                        glareEnable={true}
+                        glareMaxOpacity={0.45}
+                        scale={1.5}
+                      >
+                        <img
+                          src={node.profile_path}
+                          alt={node.name}
+                          className="w-[65px] h-[78px] min-w-[65px] min-h-[78px] object-scale-down rounded mr-2 border-white border-2"
+                        />
+                      </Tilt>
                       <Link
                         to={`/casts/${node.id}`}
                         className="font-semibold text-2xl"
