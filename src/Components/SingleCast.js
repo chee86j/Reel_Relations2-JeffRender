@@ -10,6 +10,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart as solidHeart } from "@fortawesome/free-solid-svg-icons";
 import { faHeart as regularHeart } from "@fortawesome/free-regular-svg-icons";
+import { faPlay as playTrailer } from "@fortawesome/free-solid-svg-icons";
 import Carousel from "./Carousel";
 import Spinner from "./Spinner";
 import { ChevronsLeft, ChevronsRight } from "lucide-react";
@@ -217,7 +218,7 @@ const SingleCast = () => {
         </section>
         <section className="mt-[30px] w-full mb-2">
           <h3 className="text-lg font-bold">Acting: </h3>
-          <ul className="border border-gray-300 shadow-lg rounded-lg p-2 mb-1">
+          <ul className="border border-gray-300 shadow-lg rounded-lg p-2 mb-1 hover:text-teal-200">
             {currentMovies.map((movie) => (
               <li key={movie.id} className="my-4">
                 <Link className="block" to={`/movie/${movie.id}`}>

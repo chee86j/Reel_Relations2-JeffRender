@@ -5,11 +5,13 @@ import { faHeart as solidHeart } from "@fortawesome/free-solid-svg-icons";
 import { faHeart as regularHeart } from "@fortawesome/free-regular-svg-icons";
 import { faStar as filledStar } from "@fortawesome/free-solid-svg-icons";
 import { faStar as emptyStar } from "@fortawesome/free-regular-svg-icons";
+import { faPlayCircle as PlayCircle } from "@fortawesome/free-regular-svg-icons";
 import {
   addFavoriteMovie,
   deleteFavoriteMovie,
   fetchFavoriteMovies,
   fetchMovieById,
+  fetchMovieVideoById,
   fetchMovies,
 } from "../store";
 import { useParams, NavLink, Link } from "react-router-dom";
@@ -17,6 +19,7 @@ import Spinner from "./Spinner";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Tilt from "react-parallax-tilt";
+import VideoModal from "./ui/VideoModal";
 
 // Star Rating component
 const StarRating = ({ rating }) => {
@@ -42,6 +45,7 @@ const SingleMovie = () => {
     (state) => state
   );
   const [currentPage, setCurrentPage] = useState(1);
+  const [isModalOpen, setModalOpen] = useState(false);
   const actorsPerPage = 15;
 
   const isMovieInFavorites = (movieId) => {
@@ -81,6 +85,7 @@ const SingleMovie = () => {
     dispatch(fetchMovieById(id));
     dispatch(fetchFavoriteMovies());
     dispatch(fetchMovies());
+    dispatch(fetchMovieVideoById(id));
   }, [dispatch, id]);
 
   const releaseYear = new Date(singleMovie?.release_date).getFullYear();
@@ -187,6 +192,12 @@ const SingleMovie = () => {
               )}
             </span>
           )}
+          {/* <button onClick={() => setModalOpen(true)}>Watch Trailer</button> */}
+          <FontAwesomeIcon
+            icon={PlayCircle}
+            onClick={() => setModalOpen(true)}
+            className="ml-[10px] cursor-pointer"
+          />
         </h1>
         <p className="text-xs">
           Released: {formattedDate} - Runtime: {runtimeHours}h {runtimeMinutes}m
@@ -229,6 +240,11 @@ const SingleMovie = () => {
         </section>
       </div>
       <ToastContainer position="bottom-right" />{" "}
+      <VideoModal
+        isOpen={isModalOpen}
+        onClose={() => setModalOpen(false)}
+        videoKey={singleMovie.video?.key}
+      />
     </div>
   );
 };

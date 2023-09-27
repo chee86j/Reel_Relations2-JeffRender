@@ -16,6 +16,21 @@ export const fetchMovieById = createAsyncThunk(
   }
 );
 
+export const fetchMovieVideoById = createAsyncThunk(
+  "singleMovie/fetchMovieVideoById",
+  async (id, { rejectWithValue }) => {
+    try {
+      const { data } = await axios.get(
+        `https://api.themoviedb.org/3/movie/${id}/videos?api_key=8ef1c18c56bc6d0d2ff280c6fd0b854d`
+      );
+      return data;
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error);
+    }
+  }
+);
+
 const singleMovieSlice = createSlice({
   name: "singleMovie",
   initialState: {},
@@ -27,6 +42,9 @@ const singleMovieSlice = createSlice({
     builder.addCase(fetchMovieById.rejected, (state, action) => {
       // handle the rejected case and set the state
       return "Error occurred while fetching the movie";
+    });
+    builder.addCase(fetchMovieVideoById.fulfilled, (state, action) => {
+      state.video = action.payload.results[0];
     });
   },
 });
