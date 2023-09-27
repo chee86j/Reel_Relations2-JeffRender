@@ -218,9 +218,9 @@ const SingleCast = () => {
         </section>
         <section className="mt-[30px] w-full mb-2">
           <h3 className="text-lg font-bold">Acting: </h3>
-          <ul className="border border-gray-300 shadow-lg rounded-lg p-2 mb-1 hover:text-teal-200">
+          <ul className="border border-gray-300 shadow-lg rounded-lg p-2 mb-1">
             {currentMovies.map((movie) => (
-              <li key={movie.id} className="my-4">
+              <li key={movie.id} className="my-4 hover:text-teal-200">
                 <Link className="block" to={`/movie/${movie.id}`}>
                   <span className="mr-1">
                     {movie.release_date.split("-")[0]}
