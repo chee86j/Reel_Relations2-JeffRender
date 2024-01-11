@@ -184,11 +184,13 @@ const SingleMovie = () => {
                 <FontAwesomeIcon
                   icon={solidHeart}
                   onClick={() => handleToggleFavorite(singleMovie.id)}
+                  className="cursor-pointer"
                 />
               ) : (
                 <FontAwesomeIcon
                   icon={regularHeart}
                   onClick={() => handleToggleFavorite(singleMovie.id)}
+                  className="cursor-pointer"
                 />
               )}
             </span>

@@ -12,6 +12,11 @@ const VideoModal = ({ isOpen, onClose, videoKey }) => {
         >
           Close Window
         </button>
+        <h1 className="text-2xl text-black font-bold text-center ">Trailer</h1>
+        <h2 className="text-xs text-black font-normal text-center ">
+          * If Video Doesn't Load, Please Refresh. Youtube's Algorithm Will
+          Readjust Its Recommendation
+        </h2>
         <iframe
           width="100%"
           height="55%"

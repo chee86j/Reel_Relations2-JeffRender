@@ -30,12 +30,10 @@ const SingleCast = () => {
   const [expanded, setExpanded] = useState(false);
 
   const isActorInFavorites = (actorId) => {
-    if (favoriteCasts.length === 0) {
+    if (!Array.isArray(favoriteCasts) || favoriteCasts.length === 0) {
       return false;
     }
-    return favoriteCasts.some((actor) => {
-      return actor.actorId === actorId;
-    });
+    return favoriteCasts.some((actor) => actor.actorId === actorId);
   };
 
   const handleToggleFavorite = (actorId) => {
@@ -131,11 +129,13 @@ const SingleCast = () => {
               <FontAwesomeIcon
                 icon={solidHeart}
                 onClick={() => handleToggleFavorite(singleActor.id)}
+                className="cursor-pointer"
               />
             ) : (
               <FontAwesomeIcon
                 icon={regularHeart}
                 onClick={() => handleToggleFavorite(singleActor.id)}
+                className="cursor-pointer"
               />
             )}
           </span>
