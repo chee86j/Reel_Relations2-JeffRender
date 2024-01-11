@@ -1,18 +1,21 @@
+// Load environment variables from Secrets.js
 try {
   require("./Secrets");
 } catch (ex) {
   console.log(ex);
-  //console.log('check README.md to create secrets.js if running locally');
+  console.log("Check README.md to create Secrets.js if running locally");
 }
 
+// Check if required environment variables are set
 if (!process.env.API_KEY) {
   console.log(`
-    you need to set up secrets.js in this folder\n
-    in secrets.js\n
+    You need to set up Secrets.js in this folder\n
+    In Secrets.js\n
     process.env.API_KEY = 'YOUR KEY!!';
   `);
-  throw "NO API KEY";
+  throw new Error("NO API KEY");
 }
+
 const app = require("./app");
 const { syncAndSeed } = require("./db");
 
