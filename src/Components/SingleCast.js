@@ -17,6 +17,7 @@ import { ChevronsLeft, ChevronsRight } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Tilt from "react-parallax-tilt";
+import "..//styles.css";
 
 const SingleCast = () => {
   const dispatch = useDispatch();
@@ -191,7 +192,7 @@ const SingleCast = () => {
         </section>
         <section className="mt-[30px] overflow-x-hidden">
           <h3 className="text-lg font-bold">Known For: </h3>
-          <div className="min-h-[221px] overflow-x-scroll">
+          <div className="min-h-[221px] overflow-x-scroll custom-scrollbar">
             <ul className="flex">
               {popularMovies.map((movie) => {
                 return (

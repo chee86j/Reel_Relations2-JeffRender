@@ -20,6 +20,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Tilt from "react-parallax-tilt";
 import VideoModal from "./ui/VideoModal";
+import "..//styles.css";
 
 // Star Rating component
 const StarRating = ({ rating }) => {
@@ -211,7 +212,7 @@ const SingleMovie = () => {
         </section>
         <section className="mt-[30px] overflow-x-hidden flex-1">
           <h3 className="text-lg font-bold">Top Billed Cast: </h3>
-          <div className="min-h-[221px] overflow-x-scroll">
+          <div className="min-h-[221px] overflow-x-scroll custom-scrollbar">
             <ul className="flex">
               {popularActors.map((actor) => {
                 return (

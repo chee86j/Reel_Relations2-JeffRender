@@ -23,8 +23,31 @@
   opacity: 0.3;
   border: 1px solid hsl(var(--s));
 }
+
+/* Custom scrollbar styles for a specific div */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px; /* Adjust the width if needed */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+  border: 1px solid white; /* Add white border */
+  border-radius: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--s)); /* Keep the thumb color */
+  border-radius: 5px;
+  border: 1px solid white; /* Add white border to the thumb */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #b3b3b3; /* Change the color on hover if needed */
+}
+
 @tailwind components;
 @tailwind utilities;
+
 @layer utilities {
   .max-w-4xs {
     max-width: 8rem;
