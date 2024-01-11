@@ -12,6 +12,8 @@ Our app employs a cutting-edge graph-based algorithm to power its exploration ca
 
 To unveil the degrees of separation between two actors, Reel Relations harnesses the power of the breadth-first search (BFS) algorithm. This intelligent algorithm traverses the graph methodically, tracing paths from one actor to another through their mutual movie appearances. The result is a thrilling revelation of the shortest path that connects the two actors, illuminating the degrees of separation they share.
 
+![Example of BFS](./src/Components/assets/example-search.png)
+
 All will find Reel Relations incredibly intuitive. Simply enter the names of the two actors you're curious about, and watch as the app unveils the hidden ties that are binding them through their cinematic collaborations. Prepare to be amazed as you unravel unexpected relationships and gain a deeper understanding of how everyone knows someone in the film industry.
 
 Reel Relations is inviting you to embark on an enchanting journey, where actors, movies, and degrees of separation converge. Get ready to Unveil the Secrets that Lie within the Reels and Discover a Whole New Perspective on the World of Cinema!
