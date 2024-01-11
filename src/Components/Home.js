@@ -115,6 +115,10 @@ const Home = () => {
         Discover the Enchanting World of Hollywood & Cinema From Across the
         Globe & Uncover Why It's All About Who You Know
       </p>
+      <p className="text-xs my-3 mx-20 flex flex-wrap justify-center items-center theme text-transparent hover:text-white">
+        The Larger the Degree of Separation, the Longer the Search. Results are
+        not Precached Due to Server Constraints. Thank You for Your Patience.
+      </p>
 
       <div className="flex flex-wrap justify-center sm:items-center flex-col lg:flex-row">
         <div className="flex justify-center relative">
