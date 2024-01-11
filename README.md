@@ -13,6 +13,9 @@ Welcome to Reel Relations!, an exciting application designed to unravel the intr
 
 Providing an immersive experience where you can dive into the captivating world of cinema. Through Reel Relations, you'll discover the fascinating web of relationships that intertwine actors through their shared appearances in movies.
 
+![Chrome Reel Demo](./src/Components/assets/chrome-reel.gif)
+
+
 Behind the scenes, our app employs a cutting-edge graph-based algorithm to power its exploration capabilities. The ingenious buildGraph function carefully constructs a graph representation by analyzing movies and identifying the actors who have collaborated on-screen through our PostgreSQL database. Each actor is represented as a node within the graph, while their movie collaborations form the intricate connections or edges.
 
 To unveil the degrees of separation between two actors, Reel Relations harnesses the power of the breadth-first search (BFS) algorithm. This intelligent algorithm traverses the graph methodically, tracing paths from one actor to another through their mutual movie appearances. The result is a thrilling revelation of the shortest path that connects the two actors, illuminating the degrees of separation they share.
