@@ -9,7 +9,7 @@
     "test": "JWT=shhhhh mocha",
     "test:dev": "DATABASE_URL=postgres://localhost/reel_relations_db npm run test -- --watch",
     "test:dev:quiet": "QUIET=true npm run test:dev",
-    "start:dev": "JWT=felix nodemon server/index.js --ignore dist/ --ignore src/ & npm run build:dev"
+    "start:dev": "nodemon server/index.js --ignore dist/ --ignore src/ & npm run build:dev"
   },
   "keywords": [],
   "author": "",
