@@ -62,14 +62,8 @@ const App = () => {
         backgroundPosition: "center",
       }}
     >
-      <button
-        className="theme border rounded text-teal-200 border-white-400 hover:text-white hover:border-teal-400 flex text-md tracking-tight absolute left-6 top-2 mb-4 rounded-md focus:outline-none focus:shadow-outline"
-        onClick={handleThemeToggle}
-      >
-        Theme
-      </button>
       <div style={{ paddingTop: "1rem" }}>
-        <Navbar />
+        <Navbar theme={currentIndex === 0 ? 'dark' : 'light'} toggleTheme={handleThemeToggle} />
         <Routes>
           {auth.id ? (
             <Route path="/editAccount" element={<EditAccount />} />
