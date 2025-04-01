@@ -22,10 +22,23 @@ app.get('/:id', async(req, res, next)=>{
 
 app.post('/', async(req, res, next)=>{
     try{
-        console.log('route receiving: '+ req.body)
-        res.status(201).send(await User.create(req.body));
+        console.log('Registration request:', JSON.stringify(req.body, null, 2));
+        const user = await User.create(req.body);
+        res.status(201).send(user);
     } catch(ex){
-        next(ex)
+        // Handle Sequelize validation errors
+        if (ex.name === 'SequelizeUniqueConstraintError') {
+            const field = ex.errors[0].path;
+            res.status(400).json({ 
+                error: `${field === 'username' ? 'Username' : 'Email'} is already taken`
+            });
+        } else if (ex.name === 'SequelizeValidationError') {
+            res.status(400).json({ 
+                error: ex.errors[0].message 
+            });
+        } else {
+            next(ex);
+        }
     }
 })
 

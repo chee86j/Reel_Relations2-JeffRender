@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { logout, fetchSomeActors, clearSomeActors } from "../store";
-import { SearchIcon, Star, ArrowRight } from "lucide-react";
+import { SearchIcon, Star, ArrowRight, User, Film } from "lucide-react";
 import { fetchDegreesOfSeparation } from "../utils/api";
 import Spinner from "./Spinner";
 import Autosuggest from "react-autosuggest";
@@ -196,61 +196,97 @@ const Home = () => {
         </div>
 
         {/* Results Section */}
-        <div className="mt-8">
+        <div className="mt-12">
           {loading ? (
-            <div className="flex justify-center">
+            <div className="flex justify-center items-center min-h-[200px]">
               <Spinner />
             </div>
           ) : (
             degreesOfSeparation !== null && (
-              <div className="w-full max-w-4xl mx-auto backdrop-blur-md bg-white/10 rounded-xl shadow-2xl p-8 border border-white/20">
-                <div className="text-center mb-6">
-                  <h2 className="text-2xl font-bold text-teal-400">
-                    Degrees of Separation: {degreesOfSeparation}
-                  </h2>
+              <div className="w-full max-w-6xl mx-auto backdrop-blur-md bg-white/5 rounded-2xl border border-white/10 p-8">
+                {/* Results Header */}
+                <div className="text-center mb-12">
+                  <div className="flex items-center justify-center gap-3 mb-4">
+                    <div className="h-px w-12 bg-gradient-to-r from-transparent to-teal-500/50"></div>
+                    <Star className="w-8 h-8 md:w-8 md:h-8 text-teal-400" />
+                    <h2 className="text-5xl md:text-4xl font-bold bg-gradient-to-r from-white to-teal-200 bg-clip-text text-transparent">
+                      {degreesOfSeparation} Degrees Apart
+                    </h2>
+                    <Star className="w-8 h-8 md:w-8 md:h-8 text-teal-400" />
+                    <div className="h-px w-12 bg-gradient-to-l from-transparent to-teal-500/50"></div>
+                  </div>
+                  <p className="text-xl md:text-lg text-slate-400">Follow the path of connections below</p>
                 </div>
 
-                <div className="space-y-6">
-                  {flowchart.map((node, index) => (
-                    <div key={index} className="flex flex-col items-center">
-                      {node.name ? (
-                        <div className="flex items-center gap-4 group">
-                          <Tilt
-                            className="parallax-effect-glare-scale"
-                            perspective={500}
-                            glareEnable={true}
-                            glareMaxOpacity={0.45}
-                            scale={1.02}
-                          >
-                            <div className="w-20 h-24 overflow-hidden rounded-lg border-2 border-white/20 group-hover:border-teal-500/50 transition duration-200">
-                              <img
-                                src={node.profile_path}
-                                alt={node.name}
-                                className="w-full h-full object-cover"
-                              />
+                {/* Connection Path - Horizontal Timeline */}
+                <div className="relative">
+                  {/* Horizontal Connection Line */}
+                  <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-teal-500/30 via-white/20 to-teal-500/30 transform -translate-y-1/2" />
+
+                  {/* Connection Items */}
+                  <div className="relative grid grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-8 md:gap-12 items-center">
+                    {flowchart.map((node, index) => (
+                      <div key={index} className="relative z-10">
+                        {node.name ? (
+                          // Actor Card
+                          <div className="group">
+                            <div className="relative backdrop-blur-md bg-black/40 rounded-xl border border-white/10 p-6 hover:border-teal-500/30 transition-all duration-300 hover:bg-white/5">
+                              <Tilt
+                                className="parallax-effect-glare-scale mb-6"
+                                perspective={500}
+                                glareEnable={true}
+                                glareMaxOpacity={0.45}
+                                scale={1.02}
+                              >
+                                <div className="w-full aspect-[2/3] overflow-hidden rounded-lg border-2 border-white/20 group-hover:border-teal-500/50 transition-all duration-300">
+                                  <img
+                                    src={node.profile_path}
+                                    alt={node.name}
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                              </Tilt>
+                              <Link
+                                to={`/casts/${node.id}`}
+                                className="block text-center group-hover:transform group-hover:-translate-y-1 transition-all duration-300"
+                              >
+                                <h3 className="text-3xl md:text-2xl font-medium text-white group-hover:text-teal-400 transition-colors duration-300">
+                                  {node.name}
+                                </h3>
+                              </Link>
+                              {index !== flowchart.length - 1 && (
+                                <div className="absolute -right-6 top-1/2 transform -translate-y-1/2 md:translate-x-1/2">
+                                  <ArrowRight className="w-8 h-8 md:w-6 md:h-6 text-teal-400" />
+                                </div>
+                              )}
                             </div>
-                          </Tilt>
-                          <Link
-                            to={`/casts/${node.id}`}
-                            className="text-xl font-medium hover:text-teal-400 transition duration-200"
-                          >
-                            {node.name}
-                          </Link>
-                        </div>
-                      ) : (
-                        <div className="text-center space-y-2">
-                          <p className="text-slate-400 italic">appeared in</p>
-                          <Link
-                            to={`/movie/${node.id}`}
-                            className="text-lg font-medium hover:text-teal-400 transition duration-200"
-                          >
-                            "{node.title}"
-                          </Link>
-                          <p className="text-slate-400 italic">alongside</p>
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                          </div>
+                        ) : (
+                          // Movie Card
+                          <div className="group">
+                            <div className="relative backdrop-blur-md bg-black/40 rounded-xl border border-white/10 p-6 hover:border-teal-500/30 transition-all duration-300 hover:bg-white/5">
+                              <div className="space-y-3 text-center">
+                                <Film className="w-16 h-16 md:w-12 md:h-12 text-teal-400 mx-auto mb-4 opacity-75" />
+                                <Link
+                                  to={`/movie/${node.id}`}
+                                  className="block group-hover:transform group-hover:-translate-y-1 transition-all duration-300"
+                                >
+                                  <h3 className="text-3xl md:text-2xl font-medium text-white group-hover:text-teal-400 transition-colors duration-300">
+                                    "{node.title}"
+                                  </h3>
+                                </Link>
+                              </div>
+                              {index !== flowchart.length - 1 && (
+                                <div className="absolute -right-6 top-1/2 transform -translate-y-1/2 md:translate-x-1/2">
+                                  <ArrowRight className="w-8 h-8 md:w-6 md:h-6 text-teal-400" />
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             )

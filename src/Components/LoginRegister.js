@@ -78,28 +78,34 @@ const LoginRegister = (props) => {
     };
 
     try {
-      await dispatch(addUserProfile(newUser));
+      const result = await dispatch(addUserProfile(newUser));
+      
+      if (result.error) {
+        // Handle registration error
+        setError(result.payload.error);
+        return;
+      }
 
       const credentials = {
         username,
         password,
       };
 
-      const response = await dispatch(attemptLogin(credentials)).then(
-        (result) => {
-          if (result.payload.id) {
-            setUsername("");
-            setPassword("");
-            setEmail("");
-            handleLoginFromCheckout;
-            navigate("/");
-          } else if (response.error) {
-            setError(response.payload.message);
-          }
-        }
-      );
+      const loginResponse = await dispatch(attemptLogin(credentials));
+      
+      if (loginResponse.error) {
+        setError("Registration successful but login failed. Please try logging in manually.");
+        return;
+      }
+
+      setUsername("");
+      setPassword("");
+      setEmail("");
+      handleLoginFromCheckout;
+      navigate("/");
+      
     } catch (error) {
-      setError("Error occurred during registration.");
+      setError(error.message || "Error occurred during registration.");
     }
   };
 

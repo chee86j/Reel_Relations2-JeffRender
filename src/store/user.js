@@ -18,12 +18,17 @@ export const fetchAllUsers = createAsyncThunk("fetchAllUsers", async () => {
 
 export const addUserProfile = createAsyncThunk(
   "addUserProfile",
-  async (user) => {
+  async (user, { rejectWithValue }) => {
     try {
       const { data } = await axios.post("/api/users", user);
       return data;
     } catch (err) {
-      console.log(err);
+      // Return the error message from the API
+      if (err.response && err.response.data) {
+        return rejectWithValue(err.response.data);
+      }
+      // If no specific error from API, return a generic message
+      return rejectWithValue({ error: "Registration failed. Please try again." });
     }
   }
 );
