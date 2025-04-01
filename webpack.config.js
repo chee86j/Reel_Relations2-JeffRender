@@ -2,6 +2,11 @@ const postcssPresetEnv = require("postcss-preset-env");
 
 module.exports = {
   devtool: "source-map",
+  resolve: {
+    fallback: {
+      "url": false  // Disable url module since we don't need it in the browser
+    }
+  },
   module: {
     rules: [
       {
@@ -46,7 +51,7 @@ module.exports = {
               name: "[name].[ext]",
               outputPath: "images/",
               publicPath: "images/",
-              esModule: false, // Add this line to fix the loading issue
+              esModule: false,
             },
           },
         ],

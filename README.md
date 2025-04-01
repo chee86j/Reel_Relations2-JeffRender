@@ -12,6 +12,8 @@ Our app employs a cutting-edge graph-based algorithm to power its exploration ca
 
 To unveil the degrees of separation between two actors, Reel Relations harnesses the power of the breadth-first search (BFS) algorithm. This intelligent algorithm traverses the graph methodically, tracing paths from one actor to another through their mutual movie appearances. The result is a thrilling revelation of the shortest path that connects the two actors, illuminating the degrees of separation they share.
 
+For optimal performance, we've implemented an LRU (Least Recently Used) caching system that stores search results. This means repeated searches between the same actors (in any order) will be significantly faster, as the results are cached and readily available. The cache automatically manages its size and removes least recently used entries when needed.
+
 ![Example of BFS](./src/Components/assets/example-search.png)
 
 All will find Reel Relations incredibly intuitive. Simply enter the names of the two actors you're curious about, and watch as the app unveils the hidden ties that are binding them through their cinematic collaborations. Prepare to be amazed as you unravel unexpected relationships and gain a deeper understanding of how everyone knows someone in the film industry.
@@ -34,13 +36,18 @@ Before you begin, ensure you have the following installed:
 1. **Clone the repository** and navigate to the project directory.
 2. **Install Dependencies**: Run `npm install`.
 
-3. **Environment Setup**: Create a `Secrets.js` file in the server directory and add the following environment variables:
-   process.env.API_KEY = "YOUR_TMDB_API_KEY";
-   process.env.CLIENT_ID = "YOUR_CLIENT_ID";
-   process.env.CLIENT_SECRET = "YOUR_CLIENT_SECRET";
-   process.env.REDIRECT_URL = "YOUR_REDIRECT_URL_FOR_OAUTH";
+3. **Environment Setup**: Create a `.env` file in the root directory and add the following environment variables:
+   ```
+   API_KEY=YOUR_TMDB_API_KEY
+   JWT_SECRET=YOUR_JWT_SECRET
+   DATABASE_URL=YOUR_DATABASE_URL
+   CLIENT_ID=YOUR_CLIENT_ID
+   CLIENT_SECRET=YOUR_CLIENT_SECRET
+   REDIRECT_URL=YOUR_REDIRECT_URL_FOR_OAUTH
+   ```
 
 4. **Database Setup**: Create and connect your PostgreSQL database `reel_relations_db`.
+   - The DATABASE_URL should be in the format: `postgres://username:password@localhost:5432/reel_relations_db`
 
 5. **Development Build**: Run `npm run build:dev` to build the application.
 
@@ -58,8 +65,17 @@ Before you begin, ensure you have the following installed:
 - Technology Stack: Built with the PERN stack (PostgreSQL, Express.js, React, Node.js), ensuring scalability and robustness.
 - Graph-based algorithm to analyze movie collaborations.
 - Breadth-first search (BFS) algorithm to determine degrees of separation.
+- LRU caching system for optimized search performance.
 - User-friendly interface for exploring actor connections.
 - OAuth 2.0 authentication for secure login.
 - Interactive movie & actor cards with detailed information.
 - Movie trailer previews.
 - Keep track of all your Favorite Actors and Movies under your Favorites in your Account.
+
+## Performance Optimizations
+
+- **LRU Caching**: The application implements an LRU (Least Recently Used) cache for search results:
+  - Cached results are available instantly for repeated searches
+  - Cache works bidirectionally (A→B gives same result as B→A)
+  - Automatically manages memory usage by removing least recently used entries
+  - Configurable cache size (default: 1000 entries)
