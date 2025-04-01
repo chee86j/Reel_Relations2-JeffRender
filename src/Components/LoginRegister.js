@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { attemptLogin } from "../store";
@@ -24,6 +24,7 @@ const LoginRegister = (props) => {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
+  const [isLogin, setIsLogin] = useState(true);
 
   const onChange = (ev) => {
     setCredentials({ ...credentials, [ev.target.name]: ev.target.value });
@@ -103,97 +104,119 @@ const LoginRegister = (props) => {
   };
 
   return (
-    <div className="flex items-center justify-center w-full h-60px">
-      <div className="border rounded-lg w-full px-15 max-w-xs loginRegister">
-        <h1 className="text-slate-300 mx-4 font-bold text-xl">Sign in</h1>
-        <div className="text-slate-300 mx-4 mt-1 mb-2 text-md">
-          to continue to Reel Relations
-        </div>
-        <div className="loginRegisterBox">
-          <h3 className="text-slate-300 mt-3 mx-4">Returning Users</h3>
-          <hr className="formDivider" />
-          <form onSubmit={login}>
-            {auth.error === true && (
-              <div>
-                <p className="text-orange-300">
-                  Invalid Username And/Or Password!
-                </p>
-              </div>
-            )}
-            <div className="inputContainer flex flex-col">
-              <input
-                className="text-sm placeholder-gray-500 bg-white text-black p-1 mb-2"
-                placeholder="username"
-                value={credentials.username}
-                name="username"
-                onChange={onChange}
-              />
-              <input
-                className="text-sm placeholder-gray-500 bg-white text-black p-1 mb-2"
-                placeholder="password"
-                type="password"
-                name="password"
-                value={credentials.password}
-                onChange={onChange}
-              />
-              <button className="border-2 ml-5 w-60 inline-block text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-teal-500 hover:bg-white">
-                Login
-              </button>
-            </div>
-          </form>
-        </div>
-        <div className="loginRegisterBox mt-1">
-          <h3 className="text-slate-300 mx-4">New Users</h3>
-          <hr className="formDivider" />
-          <form onSubmit={register}>
-            <div className="inputContainer flex flex-col">
-              <input
-                className="text-sm placeholder-gray-500 bg-white text-black p-1 mb-2"
-                placeholder="username"
-                name="username"
-                value={username}
-                onChange={(event) => setUsername(event.target.value)}
-              />
-              <input
-                className="text-sm placeholder-gray-500 bg-white text-black p-1 mb-2"
-                placeholder="password"
-                type="password"
-                name="password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-              />
-              <input
-                className="text-sm placeholder-gray-500 bg-white text-black p-1 mb-2"
-                placeholder="email"
-                type="email"
-                name="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-              />
-              <button className="border-2 ml-5 w-60 inline-block text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-teal-500 hover:bg-white">
-                Register
-              </button>
-            </div>
-          </form>
+    <div className="flex items-center justify-center min-h-screen w-full px-4 py-8">
+      <div className="w-full max-w-md backdrop-blur-md bg-white/10 rounded-xl shadow-2xl p-8 border border-white/20">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-white mb-2">
+            {isLogin ? "Welcome Back" : "Create Account"}
+          </h1>
+          <p className="text-slate-300 text-sm">
+            {isLogin
+              ? "Sign in to continue to Reel Relations"
+              : "Join the Reel Relations community"}
+          </p>
         </div>
 
-        <div className="flex items-center my-1">
-          <hr className="flex-grow border-t border-gray-300 mr-3" />
-          <span className="text-white">or</span>
-          <hr className="flex-grow border-t border-gray-300 ml-3" />
+        {error && (
+          <div className="mb-6 p-3 rounded-lg bg-red-500/20 border border-red-500/40 text-red-200 text-sm">
+            {error}
+          </div>
+        )}
+
+        {isLogin ? (
+          <form onSubmit={login} className="space-y-4">
+            <div className="space-y-4">
+              <div>
+                <input
+                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-slate-400 focus:outline-none focus:border-teal-500/50 transition duration-200"
+                  placeholder="Username"
+                  value={credentials.username}
+                  name="username"
+                  onChange={onChange}
+                />
+              </div>
+              <div>
+                <input
+                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-slate-400 focus:outline-none focus:border-teal-500/50 transition duration-200"
+                  placeholder="Password"
+                  type="password"
+                  name="password"
+                  value={credentials.password}
+                  onChange={onChange}
+                />
+              </div>
+            </div>
+            <button className="w-full py-3 px-4 bg-teal-500/20 hover:bg-teal-500/30 border border-teal-500/50 rounded-lg text-white font-medium transition duration-200">
+              Sign In
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={register} className="space-y-4">
+            <div className="space-y-4">
+              <div>
+                <input
+                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-slate-400 focus:outline-none focus:border-teal-500/50 transition duration-200"
+                  placeholder="Username"
+                  name="username"
+                  value={username}
+                  onChange={(event) => setUsername(event.target.value)}
+                />
+              </div>
+              <div>
+                <input
+                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-slate-400 focus:outline-none focus:border-teal-500/50 transition duration-200"
+                  placeholder="Password"
+                  type="password"
+                  name="password"
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                />
+              </div>
+              <div>
+                <input
+                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-slate-400 focus:outline-none focus:border-teal-500/50 transition duration-200"
+                  placeholder="Email"
+                  type="email"
+                  name="email"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                />
+              </div>
+            </div>
+            <button className="w-full py-3 px-4 bg-teal-500/20 hover:bg-teal-500/30 border border-teal-500/50 rounded-lg text-white font-medium transition duration-200">
+              Create Account
+            </button>
+          </form>
+        )}
+
+        <div className="mt-6">
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-white/10"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 text-slate-300 bg-transparent">Or continue with</span>
+            </div>
+          </div>
+
+          <div className="mt-6">
+            <a
+              href={`https://github.com/login/oauth/authorize?client_id=${window.CLIENT_ID}`}
+              className="w-full flex items-center justify-center px-4 py-3 border border-white/20 rounded-lg text-white hover:bg-white/5 transition duration-200"
+            >
+              <GithubIcon size={20} className="mr-2" />
+              <span>GitHub</span>
+            </a>
+          </div>
         </div>
-        <div className="ml-9 w-60 flex justify-center mt-6">
-          <a
-            href={`https://github.com/login/oauth/authorize?client_id=${window.CLIENT_ID}`}
-            className="border border-2 border-white rounded flex items-center p-2 min w-96 justify-center hover:text-teal-200 hover:border-teal-200"
+
+        <div className="mt-6 text-center">
+          <button
+            onClick={() => setIsLogin(!isLogin)}
+            className="text-sm text-slate-300 hover:text-teal-400 transition duration-200"
           >
-            <span className="text-black mr-2 opacity-100 hover:text-teal-200">
-              <GithubIcon size={24} className="text-white opacity-100" />
-            </span>
-            <span className="text-white opacity-100 ml-3 hover:text-teal-200">
-              Continue with Github
-            </span>
-          </a>
+            {isLogin ? "Need an account? Sign up" : "Already have an account? Sign in"}
+          </button>
         </div>
       </div>
     </div>

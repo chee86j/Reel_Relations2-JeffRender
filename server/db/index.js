@@ -52,7 +52,38 @@ const fetchMovieDetails = async (movieId) => {
 };
 
 const syncAndSeed = async () => {
-  await conn.sync({ force: false });
+  await conn.sync({ force: true });
+
+  // Create admin users
+  try {
+    const adminUsers = [
+      {
+        email: 'hpotter@gmail.com',
+        username: 'hpotter',
+        password: 'Qwe123!!',
+        isAdmin: true
+      },
+      {
+        email: 'moe@gmail.com',
+        username: 'moe234',
+        password: 'Qwe123!!',
+        isAdmin: true
+      }
+    ];
+
+    for (const adminData of adminUsers) {
+      const existingUser = await User.findOne({
+        where: { email: adminData.email }
+      });
+
+      if (!existingUser) {
+        await User.create(adminData);
+        console.log(`Admin user ${adminData.username} created successfully`);
+      }
+    }
+  } catch (error) {
+    console.error('Error creating admin users:', error);
+  }
 
   const totalPages = 10;
 
