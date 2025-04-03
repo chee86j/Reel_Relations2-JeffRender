@@ -11,21 +11,37 @@ app.post("/", async (req, res, next) => {
     next(ex);
   }
 });
-app.get("/github", async (req, res, next) => {
+app.get("/github/callback", async (req, res, next) => {
   try {
-    const token = await User.authenticateGithub(req.query.code);
+    const { code, state } = req.query;
+    
+    // Validate required parameters
+    if (!code) {
+      return res.status(400).json({ error: 'Authorization code is required' });
+    }
+
+    // Get token and create/update user
+    const token = await User.authenticateGithub(code);
+    
+    // Return success response with token
     res.send(`
       <html>
         <body>
           <script>
-            window.localStorage.setItem('token', '${token}');
-            window.location = '/';
+            try {
+              window.localStorage.setItem('token', '${token}');
+              window.location = '/';
+            } catch (err) {
+              console.error('Failed to store token:', err);
+              window.location = '/login?error=auth_failed';
+            }
           </script>
         </body>
       </html>
     `);
   } catch (ex) {
-    next(ex);
+    console.error('GitHub OAuth error:', ex);
+    res.redirect('/login?error=' + encodeURIComponent(ex.message || 'Authentication failed'));
   }
 });
 

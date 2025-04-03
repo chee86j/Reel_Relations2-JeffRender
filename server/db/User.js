@@ -103,8 +103,8 @@ User.authenticateGithub = async function (code) {
     "https://github.com/login/oauth/access_token",
     {
       code,
-      client_secret: process.env.CLIENT_SECRET,
-      client_id: process.env.CLIENT_ID,
+      client_secret: process.env.GITHUB_CLIENT_SECRET,
+      client_id: process.env.GITHUB_CLIENT_ID,
     },
     {
       headers: {
@@ -119,30 +119,49 @@ User.authenticateGithub = async function (code) {
     throw _error;
   }
 
+  // Fetch user profile from GitHub
   response = await axios.get("https://api.github.com/user", {
     headers: {
       authorization: `Bearer ${access_token}`,
     },
   });
 
-  const { login } = response.data;
+  const { login, avatar_url, email, name } = response.data;
+
+  // If email is private, fetch emails separately
+  let userEmail = email;
+  if (!userEmail) {
+    const emailsResponse = await axios.get("https://api.github.com/user/emails", {
+      headers: {
+        authorization: `Bearer ${access_token}`,
+      },
+    });
+    userEmail = emailsResponse.data.find(e => e.primary)?.email || `${login}@github.com`;
+  }
 
   let user = await User.findOne({
-    where: { login },
+    where: { 
+      login 
+    },
   });
 
   if (!user) {
+    // Create new user with GitHub info
     user = await User.create({
       login,
-      username: `${login}`,
-      password: `random-${Math.random()}`,
-      email: `${login}@example.com`, // Assign a default email
+      username: name || login,
+      password: `gh_${Math.random().toString(36).slice(2)}`,
+      email: userEmail,
+      avatar: avatar_url,
+    });
+  } else {
+    // Update existing user's GitHub info
+    await user.update({
+      username: name || login,
+      email: userEmail,
+      avatar: avatar_url,
     });
   }
-
-  await user.update({
-    username: `${login}`,
-  });
 
   return user.generateToken();
 };

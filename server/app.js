@@ -13,7 +13,7 @@ app.use("/static", express.static(path.join(__dirname, "../static")));
 
 app.get("/", (req, res) =>
   res.render(path.join(__dirname, "../static/index.html"), {
-    CLIENT_ID: process.env.CLIENT_ID,
+    CLIENT_ID: process.env.GITHUB_CLIENT_ID,
   })
 );
 

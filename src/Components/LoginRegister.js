@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { attemptLogin } from "../store";
@@ -25,6 +25,48 @@ const LoginRegister = (props) => {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [isLogin, setIsLogin] = useState(true);
+  const [githubState] = useState(() => Math.random().toString(36).substring(7));
+
+  useEffect(() => {
+    // Store state in localStorage to verify when GitHub redirects back
+    if (githubState) {
+      localStorage.setItem('githubState', githubState);
+    }
+
+    // Check for GitHub OAuth code and state in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    const state = urlParams.get('state');
+    const storedState = localStorage.getItem('githubState');
+
+    if (code && state && state === storedState) {
+      // Clear state from localStorage
+      localStorage.removeItem('githubState');
+      // Handle GitHub OAuth callback
+      handleGitHubCallback(code);
+    }
+  }, [githubState]);
+
+  const handleGitHubCallback = async (code) => {
+    try {
+      const response = await fetch('/api/auth/github?code=' + code);
+      if (response.ok) {
+        const html = await response.text();
+        // Create a temporary div to execute the script
+        const div = document.createElement('div');
+        div.innerHTML = html;
+        const script = div.querySelector('script');
+        if (script) {
+          eval(script.textContent);
+        }
+      } else {
+        setError('GitHub authentication failed');
+      }
+    } catch (err) {
+      setError('Failed to authenticate with GitHub');
+      console.error('GitHub auth error:', err);
+    }
+  };
 
   const onChange = (ev) => {
     setCredentials({ ...credentials, [ev.target.name]: ev.target.value });
@@ -207,11 +249,11 @@ const LoginRegister = (props) => {
 
           <div className="mt-6">
             <a
-              href={`https://github.com/login/oauth/authorize?client_id=${window.CLIENT_ID}`}
+              href={`https://github.com/login/oauth/authorize?client_id=${window.CLIENT_ID}&redirect_uri=${encodeURIComponent(window.location.origin + '/api/auth/github/callback')}&scope=user:email&state=${githubState}`}
               className="w-full flex items-center justify-center px-4 py-3 border border-white/20 rounded-lg text-white hover:bg-white/5 transition duration-200"
             >
               <GithubIcon size={20} className="mr-2" />
-              <span>GitHub</span>
+              <span>Continue with GitHub</span>
             </a>
           </div>
         </div>
