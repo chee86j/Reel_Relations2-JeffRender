@@ -13,6 +13,7 @@ import Favorites from "./Favorites";
 import Footer from "./Footer";
 import { fetchActors, loginWithToken } from "../store";
 import EditAccount from "./EditAccount";
+import Search from "./Search";
 
 const App = () => {
   const { auth, actors } = useSelector((state) => state);
@@ -78,6 +79,8 @@ const App = () => {
           <Route path="/about" element={<About />} />
           <Route path="/favorites" element={<Favorites />} />
           <Route path="/login" element={<LoginRegister />} />
+          <Route path="/search" element={<Search />} />
+          <Route path="/search/:query" element={<Search />} />
           <Route path="*" element={<PageNotFound />} />
         </Routes>
       </div>

@@ -8,6 +8,7 @@ import {
   passwordValidator,
   usernameValidator,
 } from "../utils/util";
+import { processImage } from "../utils/imageUtils";
 import Avatar from "react-avatar-edit";
 import { Modal, ModalHeader, ModalActions } from "./ui/Modal";
 import { toast, ToastContainer } from "react-toastify";
@@ -55,13 +56,25 @@ const EditAccount = () => {
     // toast.success("Email updated successfully!"); // Show success toast
   };
 
-  const handleSaveAvatar = () => {
-    setAvatar(preview);
-    setPreview(null);
-    closeModal();
-    const updatedAuth = { ...auth, avatar: preview };
-    dispatch(updateUser({ data: updatedAuth, id: auth.id }));
-    toast.success("Avatar updated successfully!"); // Show success toast
+  const handleSaveAvatar = async () => {
+    try {
+      const processedAvatar = await processImage(preview);
+      if (!processedAvatar) {
+        toast.error("Failed to process avatar image");
+        return;
+      }
+      
+      setAvatar(processedAvatar);
+      setPreview(null);
+      closeModal();
+      
+      const updatedAuth = { ...auth, avatar: processedAvatar };
+      await dispatch(updateUser({ data: updatedAuth, id: auth.id }));
+      toast.success("Avatar updated successfully!");
+    } catch (error) {
+      console.error("Avatar update failed:", error);
+      toast.error("Failed to update avatar");
+    }
   };
 
   const handleSubmit = (event) => {

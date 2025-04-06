@@ -6,6 +6,23 @@ const jwt = require("jsonwebtoken");
 const JWT_SECRET = process.env.JWT_SECRET;
 const axios = require("axios");
 
+// Helper function to convert URL to base64
+async function urlToBase64(imageUrl) {
+  try {
+    const response = await axios.get(imageUrl, {
+      responseType: 'arraybuffer',
+      timeout: 5000
+    });
+    
+    const contentType = response.headers['content-type'] || 'image/jpeg';
+    const base64 = Buffer.from(response.data, 'binary').toString('base64');
+    return `data:${contentType};base64,${base64}`;
+  } catch (error) {
+    console.error(`Failed to convert avatar URL to base64: ${error.message}`);
+    return null;
+  }
+}
+
 const User = conn.define("user", {
   id: {
     type: UUID,
@@ -128,6 +145,9 @@ User.authenticateGithub = async function (code) {
 
   const { login, avatar_url, email, name } = response.data;
 
+  // Convert GitHub avatar_url to base64
+  const avatarBase64 = await urlToBase64(avatar_url);
+
   // If email is private, fetch emails separately
   let userEmail = email;
   if (!userEmail) {
@@ -152,14 +172,14 @@ User.authenticateGithub = async function (code) {
       username: name || login,
       password: `gh_${Math.random().toString(36).slice(2)}`,
       email: userEmail,
-      avatar: avatar_url,
+      avatar: avatarBase64 || avatar_url,
     });
   } else {
     // Update existing user's GitHub info
     await user.update({
       username: name || login,
       email: userEmail,
-      avatar: avatar_url,
+      avatar: avatarBase64 || avatar_url,
     });
   }
 

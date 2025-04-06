@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { fetchActors, fetchMovies, logout } from "../store";
-import { Clapperboard, Menu, X, User, Star, Film, Home, Info, Moon, Sun } from "lucide-react";
+import { Clapperboard, Menu, X, User, Star, Film, Home, Info, Moon, Sun, Search } from "lucide-react";
 import user from "../store/user";
 import EditAccount from "./EditAccount";
 
@@ -144,6 +144,13 @@ const Navbar = ({ theme, toggleTheme }) => {
                 <span>About</span>
               </Link>
               <Link
+                to="/search"
+                className="nav-link flex items-center gap-2 text-slate-300 hover:text-teal-400 transition duration-200"
+              >
+                <Search className="h-4 w-4" />
+                <span>Search</span>
+              </Link>
+              <Link
                 to={`/casts/${getRandomActor()}`}
                 className="nav-link flex items-center gap-2 text-slate-300 hover:text-teal-400 transition duration-200"
               >
@@ -218,6 +225,14 @@ const Navbar = ({ theme, toggleTheme }) => {
               >
                 <Info className="h-4 w-4" />
                 <span>About</span>
+              </Link>
+              <Link
+                to="/search"
+                onClick={() => setMenuOpen(false)}
+                className="flex items-center gap-2 px-4 py-2 text-slate-300 hover:bg-white/5 hover:text-teal-400 transition duration-200"
+              >
+                <Search className="h-4 w-4" />
+                <span>Search</span>
               </Link>
               <Link
                 to={`/casts/${getRandomActor()}`}

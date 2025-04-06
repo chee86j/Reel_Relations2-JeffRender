@@ -1,7 +1,13 @@
 const postcssPresetEnv = require("postcss-preset-env");
+const path = require("path");
 
 module.exports = {
   devtool: "source-map",
+  output: {
+    path: path.join(__dirname, 'dist'),
+    filename: 'main.js?v=[contenthash]',
+    publicPath: '/dist/'
+  },
   resolve: {
     fallback: {
       "url": false  // Disable url module since we don't need it in the browser
