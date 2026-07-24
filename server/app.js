@@ -5,6 +5,7 @@ const Movie = require("./db/Movie");
 const Casts = require("./db/Casts");
 const degreesOfSeparation = require("./api/degreesOfSeparation");
 
+app.set("trust proxy", 1);
 app.use(express.json());
 app.engine("html", require("ejs").renderFile);
 
@@ -14,6 +15,9 @@ app.use("/static", express.static(path.join(__dirname, "../static")));
 app.get("/", (req, res) =>
   res.render(path.join(__dirname, "../static/index.html"), {
     CLIENT_ID: process.env.GITHUB_CLIENT_ID,
+    GOOGLE_AUTH_ENABLED: Boolean(
+      process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+    ),
   })
 );
 

@@ -41,9 +41,11 @@ Before you begin, ensure you have the following installed:
    API_KEY=YOUR_TMDB_API_KEY
    JWT_SECRET=YOUR_JWT_SECRET
    DATABASE_URL=YOUR_DATABASE_URL
-   CLIENT_ID=YOUR_CLIENT_ID
-   CLIENT_SECRET=YOUR_CLIENT_SECRET
-   REDIRECT_URL=YOUR_REDIRECT_URL_FOR_OAUTH
+   GITHUB_CLIENT_ID=YOUR_GITHUB_CLIENT_ID
+   GITHUB_CLIENT_SECRET=YOUR_GITHUB_CLIENT_SECRET
+   GOOGLE_CLIENT_ID=YOUR_GOOGLE_CLIENT_ID
+   GOOGLE_CLIENT_SECRET=YOUR_GOOGLE_CLIENT_SECRET
+   GOOGLE_REDIRECT_URI=http://localhost:3000/api/auth/oauth/google
    ```
 
 4. **Database Setup**: Create and connect your PostgreSQL database `reel_relations_db`.
@@ -58,6 +60,11 @@ Before you begin, ensure you have the following installed:
 
 - Run `npm run start:dev` to start the server.
 - Open `http://localhost:3000/` in your browser.
+
+For production Google sign-in, add the deployed callback URL to the Google
+OAuth client's authorized redirect URIs and set `GOOGLE_REDIRECT_URI` to the
+exact same URL. For example:
+`https://your-domain.example/api/auth/oauth/google`.
 
 ## Features
 

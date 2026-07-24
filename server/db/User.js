@@ -5,6 +5,8 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = process.env.JWT_SECRET;
 const axios = require("axios");
+const crypto = require("crypto");
+const { exchangeCodeForProfile } = require("../auth/googleOAuth");
 
 // Helper function to convert URL to base64
 async function urlToBase64(imageUrl) {
@@ -180,6 +182,58 @@ User.authenticateGithub = async function (code) {
       username: name || login,
       email: userEmail,
       avatar: avatarBase64 || avatar_url,
+    });
+  }
+
+  return user.generateToken();
+};
+
+const findAvailableUsername = async (UserModel, preferredUsername) => {
+  const base =
+    preferredUsername.trim().replace(/\s+/g, "_").slice(0, 40) || "google_user";
+  let candidate = base;
+  let suffix = 1;
+
+  while (await UserModel.findOne({ where: { username: candidate } })) {
+    candidate = `${base.slice(0, 35)}_${suffix}`;
+    suffix += 1;
+  }
+
+  return candidate;
+};
+
+User.authenticateGoogle = async function ({ code, redirectUri }) {
+  const profile = await exchangeCodeForProfile({ code, redirectUri });
+  const providerLogin = `google:${profile.providerId}`;
+
+  let user = await this.findOne({ where: { login: providerLogin } });
+
+  if (!user) {
+    user = await this.findOne({ where: { email: profile.email } });
+  }
+
+  if (user) {
+    const updates = {};
+
+    // Preserve another OAuth provider identity if this account already has one.
+    if (!user.login) {
+      updates.login = providerLogin;
+    }
+    if (!user.avatar && profile.avatarUrl) {
+      updates.avatar = profile.avatarUrl;
+    }
+
+    if (Object.keys(updates).length) {
+      await user.update(updates);
+    }
+  } else {
+    const username = await findAvailableUsername(this, profile.displayName);
+    user = await this.create({
+      login: providerLogin,
+      username,
+      email: profile.email,
+      password: crypto.randomBytes(32).toString("hex"),
+      avatar: profile.avatarUrl,
     });
   }
 

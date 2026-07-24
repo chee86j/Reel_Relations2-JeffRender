@@ -9,6 +9,7 @@ import {
   emailValidator,
 } from "../utils/util";
 import { GithubIcon } from "lucide-react";
+import { FcGoogle } from "react-icons/fc";
 
 const LoginRegister = (props) => {
   const handleLoginFromCheckout = props;
@@ -44,6 +45,12 @@ const LoginRegister = (props) => {
       localStorage.removeItem('githubState');
       // Handle GitHub OAuth callback
       handleGitHubCallback(code);
+    }
+
+    const oauthError = urlParams.get("error");
+    if (oauthError) {
+      setError(oauthError);
+      window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, [githubState]);
 
@@ -151,6 +158,25 @@ const LoginRegister = (props) => {
     }
   };
 
+  const oauthProviders = [
+    {
+      name: "GitHub",
+      href: `https://github.com/login/oauth/authorize?client_id=${
+        window.CLIENT_ID
+      }&redirect_uri=${encodeURIComponent(
+        window.location.origin + "/api/auth/github/callback"
+      )}&scope=user:email&state=${githubState}`,
+      icon: <GithubIcon size={20} className="mr-2" />,
+      enabled: Boolean(window.CLIENT_ID),
+    },
+    {
+      name: "Google",
+      href: "/api/auth/oauth/google/start",
+      icon: <FcGoogle size={20} className="mr-2" />,
+      enabled: window.GOOGLE_AUTH_ENABLED,
+    },
+  ].filter((provider) => provider.enabled);
+
   return (
     <div className="flex items-center justify-center min-h-screen w-full px-4 py-8">
       <div className="w-full max-w-md backdrop-blur-md bg-white/10 rounded-xl shadow-2xl p-8 border border-white/20">
@@ -247,14 +273,17 @@ const LoginRegister = (props) => {
             </div>
           </div>
 
-          <div className="mt-6">
-            <a
-              href={`https://github.com/login/oauth/authorize?client_id=${window.CLIENT_ID}&redirect_uri=${encodeURIComponent(window.location.origin + '/api/auth/github/callback')}&scope=user:email&state=${githubState}`}
-              className="w-full flex items-center justify-center px-4 py-3 border border-white/20 rounded-lg text-white hover:bg-white/5 transition duration-200"
-            >
-              <GithubIcon size={20} className="mr-2" />
-              <span>Continue with GitHub</span>
-            </a>
+          <div className="mt-6 space-y-3">
+            {oauthProviders.map((provider) => (
+              <a
+                key={provider.name}
+                href={provider.href}
+                className="w-full flex items-center justify-center px-4 py-3 border border-white/20 rounded-lg text-white hover:bg-white/5 transition duration-200"
+              >
+                {provider.icon}
+                <span>Continue with {provider.name}</span>
+              </a>
+            ))}
           </div>
         </div>
 
