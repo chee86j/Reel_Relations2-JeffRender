@@ -1,9 +1,12 @@
 const express = require("express");
 const app = express.Router();
-const { Casts, Movie, castsMovieLink } = require("../db");
-const bfs = require("../utils/DegreesOfSeparation"); // Update import statement
+const { Casts } = require("../db");
+const bfs = require("../utils/DegreesOfSeparation");
 const buildGraph = require("../utils/graphBuilder");
 const getCommonMovie = require("./getCommonMovie");
+const {
+  findSharedReleasedMovies,
+} = require("../services/tmdbCredits");
 
 // GET for degrees of separation between two actors
 app.get("/:castsId/:casts2Id", async (req, res, next) => {
@@ -18,18 +21,53 @@ app.get("/:castsId/:casts2Id", async (req, res, next) => {
       return res.status(404).json({ error: "Actor Not Found" });
     }
 
+    if (casts1.id === casts2.id) {
+      return res.json({
+        degreesOfSeparation: 0,
+        path: [casts1.id],
+        moviesPath: [],
+        actor1: casts1.toJSON(),
+        actor2: casts2.toJSON(),
+        creditVerification: "same-person",
+      });
+    }
+
+    // The local graph is intentionally a cache/subset. Verify the endpoints
+    // against TMDB's complete movie-credit lists before trusting a longer path.
+    let directCreditCheckCompleted = false;
+    try {
+      const sharedMovies = await findSharedReleasedMovies(casts1.id, casts2.id);
+      directCreditCheckCompleted = true;
+      if (sharedMovies.length > 0) {
+        return res.json({
+          degreesOfSeparation: 1,
+          path: [casts1.id, casts2.id],
+          moviesPath: [sharedMovies],
+          actor1: casts1.toJSON(),
+          actor2: casts2.toJSON(),
+          creditVerification: "tmdb-full-movie-credits",
+        });
+      }
+    } catch (verificationError) {
+      // Availability of the external API should not take down searches that
+      // can still be answered from the local graph.
+      console.warn(
+        "Complete-credit verification unavailable; using local graph:",
+        verificationError.message
+      );
+    }
+
     const graph = await buildGraph();
-    console.log(casts1.id, casts2.id);
 
     // Using the bfs function to find the path between the two actors
-    let path = bfs(graph, casts1.id, casts2.id);
+    const path = bfs(graph, casts1.id, casts2.id);
 
     // Calculate degrees of separation
-    let degreesOfSeparation = path ? path.length - 1 : null;
+    const degreesOfSeparation = path ? path.length - 1 : null;
 
-    let moviesPath = [];
-    for (let i = 0; i < path.length; i++) {
-      if (path[i + 1]) {
+    const moviesPath = [];
+    if (path) {
+      for (let i = 0; i < path.length - 1; i++) {
         const commonMovies = await getCommonMovie(path[i], path[i + 1]);
         moviesPath.push(commonMovies);
       }
@@ -46,6 +84,9 @@ app.get("/:castsId/:casts2Id", async (req, res, next) => {
       moviesPath,
       actor1: { ...actor1.toJSON(), profile_path: actor1.profile_path },
       actor2: { ...actor2.toJSON(), profile_path: actor2.profile_path },
+      creditVerification: directCreditCheckCompleted
+        ? "local-graph-direct-checked"
+        : "local-graph-unverified",
     });
   } catch (error) {
     next(error);

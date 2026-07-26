@@ -20,6 +20,7 @@ const Home = () => {
   const [degreesOfSeparation, setDegreesOfSeparation] = useState(null);
   const [path, setPath] = useState([]);
   const [moviesPath, setMoviesPath] = useState(null);
+  const [creditVerification, setCreditVerification] = useState(null);
   const [flowchart, setFlowchart] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
 
@@ -41,9 +42,11 @@ const Home = () => {
             profile_path: `https://image.tmdb.org/t/p/original${profilePath}`,
           });
           if (moviesPath && moviesPath[i]) {
-            temp.push(
-              moviesPath[i][Math.floor(Math.random() * moviesPath[i].length)]
-            );
+            // The API ranks shared credits by relevance. Keep the displayed
+            // explanation stable instead of choosing a random shared title.
+            if (moviesPath[i][0]) {
+              temp.push(moviesPath[i][0]);
+            }
           }
         }
       }
@@ -62,6 +65,7 @@ const Home = () => {
       setDegreesOfSeparation(response.degreesOfSeparation);
       setPath(response.path);
       setMoviesPath(response.moviesPath);
+      setCreditVerification(response.creditVerification);
       dispatch(clearSomeActors());
       setLoading(false);
     } catch (err) {
@@ -233,6 +237,19 @@ const Home = () => {
                     <div className="h-px w-12 bg-gradient-to-l from-transparent to-teal-500/50"></div>
                   </div>
                   <p className="text-xl md:text-lg text-slate-400">Follow the path of connections below</p>
+                  {creditVerification === "local-graph-direct-checked" && (
+                    <p className="mt-3 text-sm text-amber-200/80">
+                      Best path in the indexed catalog. A direct shared credit
+                      was also checked against each actor&apos;s complete TMDB
+                      movie credits.
+                    </p>
+                  )}
+                  {creditVerification === "local-graph-unverified" && (
+                    <p className="mt-3 text-sm text-amber-200/80">
+                      Best path in the indexed catalog. Complete-credit
+                      verification was temporarily unavailable.
+                    </p>
+                  )}
                 </div>
 
                 {/* Connection Path - Horizontal Timeline */}
