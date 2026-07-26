@@ -18,11 +18,13 @@ if (missingEnvVars.length > 0) {
 
 const app = require("./app");
 const { syncAndSeed } = require("./db");
+const searchCache = require("./utils/searchCache");
 
 const init = async () => {
   try {
     // Uncomment the line below ONLY for initial database setup or when you need to reset the database
     // await syncAndSeed();
+    await searchCache.initialize();
     
     const port = process.env.PORT || 3000;
     app.listen(port, () => console.log(`Listening on Port ${port}`));

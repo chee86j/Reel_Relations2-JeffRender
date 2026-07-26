@@ -7,6 +7,7 @@ const getCommonMovie = require("./getCommonMovie");
 const {
   findSharedReleasedMovies,
 } = require("../services/tmdbCredits");
+const searchCache = require("../utils/searchCache");
 
 // GET for degrees of separation between two actors
 app.get("/:castsId/:casts2Id", async (req, res, next) => {
@@ -32,6 +33,22 @@ app.get("/:castsId/:casts2Id", async (req, res, next) => {
       });
     }
 
+    const cachedResult = await searchCache.get(casts1.id, casts2.id);
+    if (cachedResult) {
+      return res.json(cachedResult);
+    }
+
+    const sendAndCache = async (result) => {
+      const expiresAt = await searchCache.set(casts1.id, casts2.id, result);
+      return res.json({
+        ...result,
+        cache: {
+          hit: false,
+          expiresAt: expiresAt ? expiresAt.toISOString() : null,
+        },
+      });
+    };
+
     // The local graph is intentionally a cache/subset. Verify the endpoints
     // against TMDB's complete movie-credit lists before trusting a longer path.
     let directCreditCheckCompleted = false;
@@ -39,7 +56,7 @@ app.get("/:castsId/:casts2Id", async (req, res, next) => {
       const sharedMovies = await findSharedReleasedMovies(casts1.id, casts2.id);
       directCreditCheckCompleted = true;
       if (sharedMovies.length > 0) {
-        return res.json({
+        return sendAndCache({
           degreesOfSeparation: 1,
           path: [casts1.id, casts2.id],
           moviesPath: [sharedMovies],
@@ -78,7 +95,7 @@ app.get("/:castsId/:casts2Id", async (req, res, next) => {
     const actor2 = await Casts.findByPk(casts2.id);
 
     // Sending the result as a JSON response with profile_path
-    res.json({
+    return sendAndCache({
       degreesOfSeparation,
       path,
       moviesPath,

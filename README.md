@@ -12,7 +12,10 @@ Our app employs a cutting-edge graph-based algorithm to power its exploration ca
 
 To unveil the degrees of separation between two actors, Reel Relations harnesses the power of the breadth-first search (BFS) algorithm. This intelligent algorithm traverses the graph methodically, tracing paths from one actor to another through their mutual movie appearances. The result is a thrilling revelation of the shortest path that connects the two actors, illuminating the degrees of separation they share.
 
-For optimal performance, we've implemented an LRU (Least Recently Used) caching system that stores search results. This means repeated searches between the same actors (in any order) will be significantly faster, as the results are cached and readily available. The cache automatically manages its size and removes least recently used entries when needed.
+For optimal performance, completed search results are cached in PostgreSQL for
+seven days. Repeated searches between the same actors, in either order, can be
+returned without repeating the TMDB credit verification and graph traversal.
+The cache persists across app restarts and Railway deployments.
 
 ![Example of BFS](./src/Components/assets/example-search.png)
 
@@ -81,8 +84,9 @@ exact same URL. For example:
 
 ## Performance Optimizations
 
-- **LRU Caching**: The application implements an LRU (Least Recently Used) cache for search results:
-  - Cached results are available instantly for repeated searches
-  - Cache works bidirectionally (A→B gives same result as B→A)
-  - Automatically manages memory usage by removing least recently used entries
-  - Configurable cache size (default: 1000 entries)
+- **PostgreSQL Search Cache**:
+  - Cached results are available immediately for repeated searches
+  - Cache works bidirectionally (A→B gives the reverse of B→A)
+  - Results expire seven days after they are calculated
+  - Algorithm-versioned keys safely invalidate results after search changes
+  - Cache failures fall back to the normal search process

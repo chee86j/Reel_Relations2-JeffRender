@@ -3,6 +3,7 @@ const conn = require("./conn");
 const User = require("./User");
 const Movie = require("./Movie");
 const Casts = require("./Casts");
+const SearchResultCache = require("./SearchResultCache");
 const axios = require("axios");
 const { FavoriteCasts, FavoriteMovies } = require("./Favorites");
 
@@ -165,4 +166,5 @@ module.exports = {
   User,
   Movie,
   Casts,
+  SearchResultCache,
 };

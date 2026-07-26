@@ -1,77 +1,124 @@
-/**
- * searchCache.js
- * Implements an LRU (Least Recently Used) cache for storing search results
- * between actors. Uses a Map for O(1) access and maintains a size limit
- * to prevent memory issues.
- */
+const { Op } = require("sequelize");
+const { SearchResultCache } = require("../db");
 
-class SearchCache {
-  constructor(maxSize = 1000) {
-    this.cache = new Map();
-    this.maxSize = maxSize;
+const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+const ALGORITHM_VERSION = "degrees-v2-complete-direct-credits";
+
+const actorPair = (firstActorId, secondActorId) => {
+  const first = Number(firstActorId);
+  const second = Number(secondActorId);
+  return {
+    low: Math.min(first, second),
+    high: Math.max(first, second),
+  };
+};
+
+const cacheKey = (firstActorId, secondActorId) => {
+  const { low, high } = actorPair(firstActorId, secondActorId);
+  return `${ALGORITHM_VERSION}:${low}:${high}`;
+};
+
+const reverseResult = (result) => ({
+  ...result,
+  path: Array.isArray(result.path) ? [...result.path].reverse() : result.path,
+  moviesPath: Array.isArray(result.moviesPath)
+    ? [...result.moviesPath].reverse()
+    : result.moviesPath,
+  actor1: result.actor2,
+  actor2: result.actor1,
+});
+
+const withoutCacheMetadata = (result) => {
+  const copy = JSON.parse(JSON.stringify(result));
+  delete copy.cache;
+  return copy;
+};
+
+const initialize = async () => {
+  try {
+    // This creates only the cache table and does not alter existing app tables.
+    await SearchResultCache.sync();
+    await SearchResultCache.destroy({
+      where: { expiresAt: { [Op.lte]: new Date() } },
+    });
+  } catch (error) {
+    console.warn("PostgreSQL search cache unavailable:", error.message);
   }
+};
 
-  // Generate a unique key for the actor pair (order-independent)
-  _generateKey(actor1, actor2) {
-    // Sort IDs to ensure same key regardless of order
-    const [id1, id2] = [actor1, actor2].sort();
-    return `${id1}-${id2}`;
-  }
+const get = async (firstActorId, secondActorId) => {
+  try {
+    const row = await SearchResultCache.findByPk(
+      cacheKey(firstActorId, secondActorId)
+    );
 
-  // Get cached result for actor pair
-  get(actor1, actor2) {
-    const key = this._generateKey(actor1, actor2);
-    const result = this.cache.get(key);
-    
-    if (result) {
-      // Update access time for LRU tracking
-      result.lastAccessed = Date.now();
-      return result.data;
+    if (!row) {
+      return null;
     }
-    
+
+    if (row.expiresAt <= new Date()) {
+      await row.destroy();
+      return null;
+    }
+
+    await row.update({ lastAccessedAt: new Date() });
+
+    const storedResult = withoutCacheMetadata(row.response);
+    const requestedFirstId = Number(firstActorId);
+    const storedFirstId = Number(storedResult.actor1?.id);
+    const result =
+      requestedFirstId === storedFirstId
+        ? storedResult
+        : reverseResult(storedResult);
+
+    return {
+      ...result,
+      cache: {
+        hit: true,
+        expiresAt: row.expiresAt.toISOString(),
+      },
+    };
+  } catch (error) {
+    console.warn("PostgreSQL search cache read failed:", error.message);
     return null;
   }
+};
 
-  // Store result for actor pair
-  set(actor1, actor2, data) {
-    const key = this._generateKey(actor1, actor2);
-    
-    // If cache is full, remove least recently used entry
-    if (this.cache.size >= this.maxSize) {
-      let oldestKey = null;
-      let oldestTime = Infinity;
-      
-      for (const [k, v] of this.cache.entries()) {
-        if (v.lastAccessed < oldestTime) {
-          oldestTime = v.lastAccessed;
-          oldestKey = k;
-        }
-      }
-      
-      if (oldestKey) {
-        this.cache.delete(oldestKey);
-      }
-    }
-    
-    // Store new data with timestamp
-    this.cache.set(key, {
-      data,
-      lastAccessed: Date.now()
+const set = async (firstActorId, secondActorId, result) => {
+  try {
+    const { low, high } = actorPair(firstActorId, secondActorId);
+    const cleanResult = withoutCacheMetadata(result);
+    const canonicalResult =
+      Number(cleanResult.actor1?.id) === low
+        ? cleanResult
+        : reverseResult(cleanResult);
+    const now = new Date();
+    const expiresAt = new Date(now.getTime() + CACHE_TTL_MS);
+
+    await SearchResultCache.upsert({
+      key: cacheKey(low, high),
+      actorLowId: low,
+      actorHighId: high,
+      algorithmVersion: ALGORITHM_VERSION,
+      response: canonicalResult,
+      expiresAt,
+      lastAccessedAt: now,
     });
+
+    return expiresAt;
+  } catch (error) {
+    console.warn("PostgreSQL search cache write failed:", error.message);
+    return null;
   }
+};
 
-  // Clear the entire cache
-  clear() {
-    this.cache.clear();
-  }
-
-  // Get cache size
-  size() {
-    return this.cache.size;
-  }
-}
-
-// Create singleton instance
-const searchCache = new SearchCache();
-
-module.exports = searchCache; 
+module.exports = {
+  ALGORITHM_VERSION,
+  CACHE_TTL_MS,
+  actorPair,
+  cacheKey,
+  get,
+  initialize,
+  reverseResult,
+  set,
+};
